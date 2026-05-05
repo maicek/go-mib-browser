@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/AllenDang/cimgui-go/backend"
 	"github.com/AllenDang/cimgui-go/backend/glfwbackend"
 	"github.com/AllenDang/cimgui-go/imgui"
+	"github.com/maicek/go-mib-browser/gui"
+	"github.com/maicek/go-mib-browser/smi"
 )
 
 // Handle OS window
@@ -26,16 +28,14 @@ func CreateOsWindow() {
 	io.SetIniFilename("imgui.ini")
 
 	bnd.SetCloseCallback(func() {
-		fmt.Println("window is closing")
+		os.Exit(1)
 	})
+
+	smi.Init()
+
+	gui.InitFont()
 
 	bnd.Run(func() {
-		loop()
+		gui.RenderGui()
 	})
-}
-
-func loop() {
-	imgui.Begin("MIB Browser")
-
-	imgui.End()
 }
