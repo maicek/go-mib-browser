@@ -43,6 +43,8 @@ func RenderGui() {
 	RenderMibTree()
 	RenderLoadedMibs()
 	RenderNodeDetails()
+	RenderResultsWindow()
+	RenderToolbox()
 }
 
 func RenderLoadedMibs() {
