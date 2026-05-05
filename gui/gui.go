@@ -7,10 +7,13 @@ import (
 	"github.com/AllenDang/cimgui-go/imgui"
 	"github.com/maicek/go-mib-browser/smi"
 	"github.com/sleepinggenius2/gosmi"
+	"golang.design/x/clipboard"
 )
 
 //go:embed Roboto.ttf
 var fontFs embed.FS
+
+var clipboardSupported = false
 
 func InitFont() {
 	io := imgui.CurrentIO()
@@ -34,6 +37,13 @@ func InitFont() {
 		fontConfig,
 		ranges,
 	)
+}
+
+func Init() {
+	err := clipboard.Init()
+	if err == nil {
+		clipboardSupported = true
+	}
 }
 
 // RenderGui renders all panels as free-floating windows (lib mode).
@@ -112,6 +122,12 @@ func renderNodeDetailsContent() {
 	imgui.TextDisabled("OID")
 	imgui.SameLine()
 	imgui.Text(n.OID)
+	if clipboardSupported {
+		imgui.SameLine()
+		if imgui.Button("Copy") {
+			clipboard.Write(clipboard.FmtText, []byte(n.OID))
+		}
+	}
 
 	if n.Type != "" {
 		imgui.TextDisabled("Type")

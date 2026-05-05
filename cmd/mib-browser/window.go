@@ -35,6 +35,7 @@ func CreateOsWindow() {
 	})
 
 	smi.Init()
+	gui.Init()
 
 	gui.InitFont()
 	gui.ApplyTheme()
