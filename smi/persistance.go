@@ -18,17 +18,22 @@ func GetCustomMibs() ([]string, error) {
 
 	fileData, err := os.ReadFile(datafilePath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return []string{}, nil
+		}
 		return []string{}, err
 	}
 
-	paths := strings.Split(string(fileData), ";")
+	raw := strings.TrimSpace(string(fileData))
+	if raw == "" {
+		return []string{}, nil
+	}
 
-	return paths, nil
+	return strings.Split(raw, ";"), nil
 }
 
 func deduplicateCacheEntries(entries *[]string) {
 	seen := make(map[string]struct{}, len(*entries))
-
 	j := 0
 	for _, entry := range *entries {
 		if _, ok := seen[entry]; !ok {
@@ -37,17 +42,12 @@ func deduplicateCacheEntries(entries *[]string) {
 			j++
 		}
 	}
-
 	*entries = (*entries)[:j]
 }
 
 func PushCustomMib(mibPath string) {
-	currentData, err := GetCustomMibs()
-	if err != nil {
-		fmt.Printf("Error happened when loading current file: %s\n", err)
-	}
+	currentData, _ := GetCustomMibs()
 	currentData = append(currentData, mibPath)
-
 	deduplicateCacheEntries(&currentData)
 
 	raw := strings.Join(currentData, ";")
@@ -57,12 +57,11 @@ func PushCustomMib(mibPath string) {
 		return
 	}
 
-	file, err := os.Create(datafilePath)
+	err = os.WriteFile(datafilePath, []byte(raw), 0644)
 	if err != nil {
+		fmt.Printf("Error writing data file: %s\n", err)
 		return
 	}
 
 	fmt.Printf("Wrote data file: %s with \"%s\"\n", datafilePath, raw)
-
-	file.Write([]byte(raw))
 }
