@@ -129,6 +129,18 @@ func renderNodeDetailsContent() {
 		}
 	}
 
+	if n.SourceMib != "" {
+		imgui.TextDisabled("MIB:")
+		imgui.SameLine()
+		imgui.Text(n.SourceMib)
+	}
+
+	if n.Access != "" {
+		imgui.TextDisabled("Access:")
+		imgui.SameLine()
+		imgui.Text(n.Access)
+	}
+
 	if n.Type != "" {
 		imgui.TextDisabled("Type")
 		imgui.SameLine()
@@ -141,4 +153,5 @@ func renderNodeDetailsContent() {
 		imgui.Spacing()
 		imgui.TextWrapped(n.Description)
 	}
+
 }

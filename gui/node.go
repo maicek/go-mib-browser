@@ -21,7 +21,7 @@ func RenderMibNode(node *smi.MibNode) {
 		flags |= imgui.TreeNodeFlagsSelected
 	}
 
-	isOpen := imgui.TreeNodeExStrV(node.Name, flags)
+	isOpen := imgui.TreeNodeExStrV(fmt.Sprintf("%s##%s", node.Name, node.OID), flags)
 
 	if imgui.BeginPopupContextItem() {
 		if imgui.MenuItemBool("Get") {

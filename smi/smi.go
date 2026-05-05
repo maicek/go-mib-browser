@@ -20,6 +20,8 @@ type MibNode struct {
 	Name        string
 	OID         string
 	Description string
+	SourceMib   string
+	Access      string
 	Type        string
 	Children    []*MibNode
 }
@@ -155,6 +157,8 @@ func rebuildTreeLocked() {
 				localNodeMap[oidStr] = &MibNode{
 					Name:        n.Name,
 					OID:         oidStr,
+					Access:      n.Access.String(),
+					SourceMib:   mod.Name,
 					Description: n.Description,
 					Type:        typeStr,
 				}
