@@ -21,7 +21,6 @@ func InitFont() {
 	}
 
 	fontConfig := imgui.NewFontConfig()
-
 	fontConfig.SetFontDataOwnedByAtlas(false)
 
 	ranges := io.Fonts().GlyphRangesDefault()
@@ -37,9 +36,8 @@ func InitFont() {
 	)
 }
 
-// Handle gui rendering
+// RenderGui renders all panels as free-floating windows (lib mode).
 func RenderGui() {
-
 	RenderMibTree()
 	RenderLoadedMibs()
 	RenderNodeDetails()
@@ -47,50 +45,84 @@ func RenderGui() {
 	RenderToolbox()
 }
 
-func RenderLoadedMibs() {
-	imgui.Begin("Loaded MIB's##mibloader")
-
-	if imgui.Button("Load MIB's") {
-		openFilePicker()
-	}
-
-	if imgui.TreeNodeExStr("Loaded modules") {
-		for _, mod := range gosmi.GetLoadedModules() {
-			imgui.BulletText(mod.Name)
-		}
-
-		imgui.TreePop()
-	}
-
-	imgui.End()
-}
+// ─── MIB Tree ────────────────────────────────────────────────────────────────
 
 func RenderMibTree() {
 	imgui.Begin("MIB Tree##treeview")
-
 	if smi.RootNode != nil {
 		RenderMibNode(smi.RootNode)
 	} else {
-		imgui.Text("Load any mib file first")
+		imgui.TextDisabled("No MIB loaded. Use the Toolbox to load a file.")
 	}
-
 	imgui.End()
 }
 
-func RenderNodeDetails() {
-	imgui.Begin("Node Details##nodedetails")
+// ─── Loaded MIBs ─────────────────────────────────────────────────────────────
 
-	if SelectedNode != nil {
-		imgui.Text("Name: " + SelectedNode.Name)
-		imgui.Text("OID: " + SelectedNode.OID)
-		if SelectedNode.Type != "" {
-			imgui.Text("Type: " + SelectedNode.Type)
-		}
-		imgui.Separator()
-		imgui.TextWrapped(SelectedNode.Description)
-	} else {
-		imgui.Text("Select a node from the tree.")
+func RenderLoadedMibs() {
+	imgui.Begin("Loaded MIB's##mibloader")
+	renderLoadedMibsContent()
+	imgui.End()
+}
+
+func renderLoadedMibsContent() {
+	if imgui.Button("  Load MIB file  ") {
+		openFilePicker()
+	}
+	imgui.Spacing()
+	imgui.Separator()
+	imgui.Spacing()
+
+	mods := gosmi.GetLoadedModules()
+	if len(mods) == 0 {
+		imgui.TextDisabled("No modules loaded.")
+		return
 	}
 
+	if imgui.TreeNodeExStrV("Loaded modules", imgui.TreeNodeFlagsDefaultOpen) {
+		for _, mod := range mods {
+			imgui.BulletText(mod.Name)
+		}
+		imgui.TreePop()
+	}
+}
+
+// ─── Node Details ─────────────────────────────────────────────────────────────
+
+func RenderNodeDetails() {
+	imgui.Begin("Node Details##nodedetails")
+	renderNodeDetailsContent()
 	imgui.End()
+}
+
+func renderNodeDetailsContent() {
+	if SelectedNode == nil {
+		imgui.TextDisabled("Select a node from the tree.")
+		return
+	}
+
+	n := SelectedNode
+
+	imgui.PushStyleColorVec4(imgui.ColText, imgui.Vec4{X: 0.46, Y: 0.70, Z: 1.00, W: 1.00})
+	imgui.Text(n.Name)
+	imgui.PopStyleColor()
+
+	imgui.Spacing()
+
+	imgui.TextDisabled("OID")
+	imgui.SameLine()
+	imgui.Text(n.OID)
+
+	if n.Type != "" {
+		imgui.TextDisabled("Type")
+		imgui.SameLine()
+		imgui.Text(n.Type)
+	}
+
+	if n.Description != "" {
+		imgui.Spacing()
+		imgui.Separator()
+		imgui.Spacing()
+		imgui.TextWrapped(n.Description)
+	}
 }

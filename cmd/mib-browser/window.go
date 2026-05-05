@@ -17,11 +17,14 @@ func CreateOsWindow() {
 		panic(err)
 	}
 
-	bnd.SetBgColor(imgui.NewVec4(0.35, 0.45, 0.5, 0.5))
-	bnd.CreateWindow("MIB Browser", 800, 600)
+	bnd.SetBgColor(imgui.NewVec4(0.09, 0.10, 0.13, 1.0))
+	bnd.CreateWindow("MIB Browser", 1280, 720)
 
 	io := imgui.CurrentIO()
-	flags := io.ConfigFlags()
+
+	// Enable docking
+	flags := io.ConfigFlags() | imgui.ConfigFlagsDockingEnable
+	// Disable viewports (single window mode)
 	flags = flags &^ imgui.ConfigFlagsViewportsEnable
 	io.SetConfigFlags(flags)
 
@@ -34,8 +37,9 @@ func CreateOsWindow() {
 	smi.Init()
 
 	gui.InitFont()
+	gui.ApplyTheme()
 
 	bnd.Run(func() {
-		gui.RenderGui()
+		gui.RenderStandaloneLayout()
 	})
 }
