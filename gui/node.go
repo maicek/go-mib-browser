@@ -5,6 +5,7 @@ import (
 
 	"github.com/AllenDang/cimgui-go/imgui"
 	"github.com/maicek/go-mib-browser/smi"
+	"golang.design/x/clipboard"
 )
 
 var SelectedNode *smi.MibNode
@@ -29,6 +30,10 @@ func RenderMibNode(node *smi.MibNode) {
 
 		if imgui.MenuItemBool("Walk") {
 			fmt.Printf("Walk")
+		}
+
+		if imgui.MenuItemBool("Copy OID") {
+			clipboard.Write(clipboard.FmtText, []byte(node.OID))
 		}
 
 		imgui.EndPopup()
