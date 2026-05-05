@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"fmt"
+
 	"github.com/AllenDang/cimgui-go/imgui"
 	"github.com/maicek/go-mib-browser/smi"
 )
@@ -19,6 +21,18 @@ func RenderMibNode(node *smi.MibNode) {
 	}
 
 	isOpen := imgui.TreeNodeExStrV(node.Name, flags)
+
+	if imgui.BeginPopupContextItem() {
+		if imgui.MenuItemBool("Get") {
+			fmt.Printf("Get")
+		}
+
+		if imgui.MenuItemBool("Walk") {
+			fmt.Printf("Walk")
+		}
+
+		imgui.EndPopup()
+	}
 
 	if imgui.IsItemClicked() {
 		SelectedNode = node

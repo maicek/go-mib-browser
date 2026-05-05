@@ -32,6 +32,6 @@ func openFilePicker() {
 
 		fmt.Printf("Selected file: %s\n", filePath)
 
-		smi.LoadFromFile(filePath)
+		smi.LoadFromFile(filePath, false)
 	}()
 }

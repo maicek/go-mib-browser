@@ -32,7 +32,6 @@ var (
 
 func Init() {
 	smiMutex.Lock()
-	defer smiMutex.Unlock()
 
 	gosmi.Init()
 
@@ -56,10 +55,20 @@ func Init() {
 	gosmi.LoadModule("SNMPv2-MIB")
 	gosmi.LoadModule("IF-MIB")
 
+	smiMutex.Unlock()
+
+	mibPaths, err := GetCustomMibs()
+	if err == nil {
+		for _, path := range mibPaths {
+			fmt.Printf("Load %s\n", path)
+			LoadFromFile(path, true)
+		}
+	}
+
 	rebuildTreeLocked()
 }
 
-func LoadFromFile(filePath string) error {
+func LoadFromFile(filePath string, cached bool) error {
 	smiMutex.Lock()
 	defer smiMutex.Unlock()
 
@@ -96,6 +105,11 @@ func LoadFromFile(filePath string) error {
 	_, err = gosmi.LoadModule(moduleName)
 	if err != nil {
 		return fmt.Errorf("gosmi cannot load module %s: %w", moduleName, err)
+	}
+
+	if !cached {
+		fmt.Printf("Cached...")
+		PushCustomMib(filePath)
 	}
 
 	rebuildTreeLocked()
