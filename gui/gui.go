@@ -58,9 +58,16 @@ func RenderGui() {
 // ─── MIB Tree ────────────────────────────────────────────────────────────────
 
 func RenderMibTree() {
-	imgui.Begin("MIB Tree##treeview")
-	if smi.RootNode != nil {
-		RenderMibNode(smi.RootNode)
+	imgui.SetNextWindowSizeConstraints(imgui.Vec2{X: 300, Y: -1}, imgui.Vec2{X: 800, Y: -1})
+
+	imgui.BeginV("MIB Tree##treeview", nil, 0)
+
+	smi.TreeMutex.RLock()
+	root := smi.RootNode
+	smi.TreeMutex.RUnlock()
+
+	if root != nil {
+		RenderMibNode(root)
 	} else {
 		imgui.TextDisabled("No MIB loaded. Use the Toolbox to load a file.")
 	}

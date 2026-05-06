@@ -10,6 +10,11 @@ import (
 	"github.com/maicek/go-mib-browser/smi"
 )
 
+var (
+	showMetricsWindow bool = false
+	showDemoWindow    bool = false
+)
+
 // Handle OS window
 func CreateOsWindow() {
 	bnd, err := backend.CreateBackend(glfwbackend.NewGLFWBackend())
@@ -19,6 +24,8 @@ func CreateOsWindow() {
 
 	bnd.SetBgColor(imgui.NewVec4(0.09, 0.10, 0.13, 1.0))
 	bnd.CreateWindow("MIB Browser", 1280, 720)
+	bnd.SetTargetFPS(120)
+	bnd.SetSwapInterval(glfwbackend.GLFWSwapIntervalVsync)
 
 	io := imgui.CurrentIO()
 
@@ -42,5 +49,26 @@ func CreateOsWindow() {
 
 	bnd.Run(func() {
 		gui.RenderStandaloneLayout()
+
+		if showMetricsWindow {
+			imgui.ShowMetricsWindowV(&showMetricsWindow)
+		}
+
+		if showDemoWindow {
+			imgui.ShowDemoWindowV(&showDemoWindow)
+		}
+
+		if imgui.BeginMainMenuBar() {
+			if imgui.BeginMenu("View") {
+				if imgui.MenuItemBoolV("ImGui Metrics (DevTools)", "", showMetricsWindow, true) {
+					showMetricsWindow = !showMetricsWindow
+				}
+				if imgui.MenuItemBoolV("ImGui Demo Window", "", showDemoWindow, true) {
+					showDemoWindow = !showDemoWindow
+				}
+				imgui.EndMenu()
+			}
+			imgui.EndMainMenuBar()
+		}
 	})
 }

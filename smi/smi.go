@@ -26,6 +26,7 @@ type NodeDetails struct {
 type MibNode struct {
 	Name        string
 	OID         string
+	Label       string // Pre-calculated for performance
 	Description string
 	SourceMib   string
 	Access      string
@@ -38,6 +39,7 @@ type MibNode struct {
 var (
 	RootNode   *MibNode
 	smiMutex   sync.Mutex
+	TreeMutex  sync.RWMutex
 	tempMibDir string
 )
 
@@ -72,17 +74,17 @@ func Init() {
 	if err == nil {
 		for _, path := range mibPaths {
 			fmt.Printf("Load %s\n", path)
-			LoadFromFile(path, true)
+			// Pass true for cached so it doesn't trigger side effects, 
+			// and we should add a non-rebuilding version of LoadFromFile if needed,
+			// but for now, let's just make sure we only rebuild at the end.
+			loadFromFileInternal(path)
 		}
 	}
 
 	rebuildTreeLocked()
 }
 
-func LoadFromFile(filePath string, cached bool) error {
-	smiMutex.Lock()
-	defer smiMutex.Unlock()
-
+func loadFromFileInternal(filePath string) error {
 	absPath, err := filepath.Abs(filePath)
 	if err != nil {
 		return err
@@ -93,7 +95,7 @@ func LoadFromFile(filePath string, cached bool) error {
 		return fmt.Errorf("cannot read module name: %w", err)
 	}
 
-	fmt.Printf("Loading file from dist: %s (detected module: %s)\n", filePath, moduleName)
+	fmt.Printf("Loading file: %s (%s)\n", filePath, moduleName)
 
 	if tempMibDir == "" {
 		tempMibDir, _ = os.MkdirTemp("", "go-mibs-*")
@@ -108,18 +110,22 @@ func LoadFromFile(filePath string, cached bool) error {
 	}
 
 	idealPath := filepath.Join(tempMibDir, moduleName)
-	err = os.WriteFile(idealPath, content, 0644)
-	if err != nil {
-		return fmt.Errorf("cannot parse temp file: %w", err)
-	}
+	os.WriteFile(idealPath, content, 0644)
 
-	_, err = gosmi.LoadModule(moduleName)
+	gosmi.LoadModule(moduleName)
+	return nil
+}
+
+func LoadFromFile(filePath string, cached bool) error {
+	smiMutex.Lock()
+	defer smiMutex.Unlock()
+
+	err := loadFromFileInternal(filePath)
 	if err != nil {
-		return fmt.Errorf("gosmi cannot load module %s: %w", moduleName, err)
+		return err
 	}
 
 	if !cached {
-		fmt.Printf("Cached...")
 		PushCustomMib(filePath)
 	}
 
@@ -210,6 +216,7 @@ func rebuildTreeLocked() {
 				localNodeMap[oidStr] = &MibNode{
 					Name:   n.Name,
 					OID:    oidStr,
+					Label:  fmt.Sprintf("%s##%s", n.Name, oidStr),
 					Access: n.Access.String(),
 
 					SourceMib:   mod.Name,
@@ -221,22 +228,26 @@ func rebuildTreeLocked() {
 		}
 	}
 
-	RootNode = &MibNode{Name: "Root", OID: ""}
+	newRoot := &MibNode{Name: "Root", OID: "", Label: "Root##root"}
 
 	for oidStr, node := range localNodeMap {
 		parentOid := getParentOID(oidStr)
 		if parentNode, exists := localNodeMap[parentOid]; exists {
 			parentNode.Children = append(parentNode.Children, node)
 		} else {
-			RootNode.Children = append(RootNode.Children, node)
+			newRoot.Children = append(newRoot.Children, node)
 		}
 	}
 
-	for _, child := range RootNode.Children {
+	for _, child := range newRoot.Children {
 		flattenBaseOIDs(child)
 	}
 
-	sortTree(RootNode)
+	sortTree(newRoot)
+
+	TreeMutex.Lock()
+	RootNode = newRoot
+	TreeMutex.Unlock()
 }
 
 func flattenBaseOIDs(node *MibNode) {
@@ -254,6 +265,7 @@ func flattenBaseOIDs(node *MibNode) {
 
 		node.Name = node.Name + "." + single.Name
 		node.OID = single.OID
+		node.Label = fmt.Sprintf("%s##%s", node.Name, node.OID)
 		node.Description = single.Description
 		node.Type = single.Type
 		node.Children = single.Children
