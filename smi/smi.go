@@ -11,10 +11,17 @@ import (
 	"sync"
 
 	"github.com/sleepinggenius2/gosmi"
+	"github.com/sleepinggenius2/gosmi/types"
 )
 
 //go:embed native/*
 var fs embed.FS
+
+type NodeDetails struct {
+	Syntax  string
+	DefVal  string
+	Indexes string
+}
 
 type MibNode struct {
 	Name        string
@@ -22,7 +29,9 @@ type MibNode struct {
 	Description string
 	SourceMib   string
 	Access      string
+	Syntax      string
 	Type        string
+	Details     *NodeDetails
 	Children    []*MibNode
 }
 
@@ -143,6 +152,47 @@ func extractModuleName(filePath string) (string, error) {
 	return "", fmt.Errorf("cannot find DEFINITIONS keyword")
 }
 
+func ExtractNodeDetails(node gosmi.SmiNode) NodeDetails {
+	var details NodeDetails
+
+	if node.Type != nil {
+		details.Syntax = node.Type.Name
+
+		if len(node.Type.Ranges) > 0 {
+			var ranges []string
+			for _, r := range node.Type.Ranges {
+				ranges = append(ranges, fmt.Sprintf("%v..%v", r.MinValue, r.MaxValue))
+			}
+			details.Syntax += fmt.Sprintf(" { %s }", strings.Join(ranges, " | "))
+		}
+
+		if node.Type.Enum != nil && len(node.Type.Enum.Values) > 0 {
+			var enums []string
+			for _, e := range node.Type.Enum.Values {
+				enums = append(enums, fmt.Sprintf("%s(%v)", e.Name, e.Value))
+			}
+			details.Syntax += fmt.Sprintf(" { %s }", strings.Join(enums, ", "))
+		}
+	}
+
+	raw := node.GetRaw()
+	if raw != nil {
+		if raw.Value.Value != nil {
+			details.DefVal = fmt.Sprintf("%v", raw.Value.Value)
+		}
+
+		if raw.IndexKind == types.IndexUnknown || raw.IndexKind == types.IndexAugment {
+			var idxNames []string
+			for _, idxNode := range node.GetIndex() {
+				idxNames = append(idxNames, idxNode.Name)
+			}
+			details.Indexes = strings.Join(idxNames, ", ")
+		}
+	}
+
+	return details
+}
+
 func rebuildTreeLocked() {
 	localNodeMap := make(map[string]*MibNode)
 
@@ -154,13 +204,18 @@ func rebuildTreeLocked() {
 				if n.Type != nil {
 					typeStr = n.Type.Name
 				}
+
+				details := ExtractNodeDetails(n)
+
 				localNodeMap[oidStr] = &MibNode{
-					Name:        n.Name,
-					OID:         oidStr,
-					Access:      n.Access.String(),
+					Name:   n.Name,
+					OID:    oidStr,
+					Access: n.Access.String(),
+
 					SourceMib:   mod.Name,
 					Description: n.Description,
 					Type:        typeStr,
+					Details:     &details,
 				}
 			}
 		}

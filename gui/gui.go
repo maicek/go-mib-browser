@@ -124,7 +124,7 @@ func renderNodeDetailsContent() {
 	imgui.Text(n.OID)
 	if clipboardSupported {
 		imgui.SameLine()
-		if imgui.Button("Copy") {
+		if imgui.Button("Copy##copy_oid") {
 			clipboard.Write(clipboard.FmtText, []byte(n.OID))
 		}
 	}
@@ -145,6 +145,35 @@ func renderNodeDetailsContent() {
 		imgui.TextDisabled("Type")
 		imgui.SameLine()
 		imgui.Text(n.Type)
+	}
+
+	if n.Details != nil {
+		if n.Details.DefVal != "" {
+			imgui.TextDisabled("Default")
+			imgui.SameLine()
+			imgui.Text(n.Details.DefVal)
+		}
+
+		if n.Details.Indexes != "" {
+			imgui.TextDisabled("Indexes")
+			imgui.SameLine()
+			imgui.Text(n.Details.Indexes)
+		}
+
+		if n.Details.Syntax != "" {
+			imgui.TextDisabled("Syntax")
+			imgui.SameLine()
+
+			imgui.TextWrapped(n.Details.Syntax)
+
+			if clipboardSupported {
+				imgui.SameLine()
+				if imgui.Button("Copy##copy_syntax") {
+					clipboard.Write(clipboard.FmtText, []byte(n.Syntax))
+				}
+			}
+
+		}
 	}
 
 	if n.Description != "" {
