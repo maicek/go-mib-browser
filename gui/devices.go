@@ -109,6 +109,31 @@ func RenderDevicesConfig() {
 		devices.AddNewDevice()
 	}
 
+	availY := imgui.ContentRegionAvail().Y
+
+	itemHeight := imgui.FrameHeightWithSpacing()
+	if availY > itemHeight {
+		imgui.SetCursorPos(imgui.CursorPos().Add(imgui.Vec2{X: 0, Y: availY}).Add(imgui.Vec2{X: 0, Y: itemHeight}).Add(imgui.Vec2{X: 0, Y: -74.0}))
+	}
+
+	imgui.TextDisabled("Changes needs to be saved to persistent storage. Click Save.")
+
+	btnColor := imgui.Vec4{X: 0.1, Y: 0.4, Z: 0.1, W: 1}
+	imgui.PushStyleColorVec4(imgui.ColButton, btnColor)
+
+	if imgui.ButtonV("Save", imgui.Vec2{X: -1, Y: 0}) {
+		devices.SaveDevices()
+		managingDevices = false
+	}
+	imgui.PopStyleColor()
+
+	if imgui.BeginItemTooltip() {
+		imgui.Text("This will save the list of devices in app data file.")
+
+		imgui.EndTooltip()
+
+	}
+
 	imgui.End()
 }
 
