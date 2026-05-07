@@ -33,6 +33,7 @@ type MibNode struct {
 	Syntax      string
 	Type        string
 	Details     *NodeDetails
+	IsOpen      bool
 	Children    []*MibNode
 }
 
