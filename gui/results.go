@@ -40,8 +40,27 @@ func (m *MainResultTable) AddResult(p *gosnmp.SnmpPDU) {
 	})
 }
 
+func (m *MainResultTable) Clear() {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.Results = make([]ResultItem, 0)
+}
+
 func RenderResultsWindow() {
-	imgui.Begin("Results")
+	flags := imgui.WindowFlagsMenuBar
+
+	imgui.BeginV("Results", nil, flags)
+
+	if imgui.BeginMenuBar() {
+		if imgui.BeginMenu("Tools") {
+			if imgui.MenuItemBool("Clear") {
+				mainResultTable.Clear()
+			}
+			imgui.EndMenu()
+		}
+
+		imgui.EndMenuBar()
+	}
 
 	if imgui.BeginTableV("Result table", 2, imgui.TableFlagsSortable|imgui.TableFlagsResizable|imgui.TableFlagsBorders, imgui.Vec2{X: 0, Y: 0}, 0.0) {
 		imgui.TableSetupColumn("Name")
