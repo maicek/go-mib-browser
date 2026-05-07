@@ -1,8 +1,6 @@
 package gui
 
 import (
-	"fmt"
-
 	"github.com/maicek/go-mib-browser/smi"
 	"github.com/sqweek/dialog"
 )
@@ -29,8 +27,6 @@ func openFilePicker() {
 		if err != nil {
 			return
 		}
-
-		fmt.Printf("Selected file: %s\n", filePath)
 
 		smi.LoadFromFile(filePath, false)
 	}()

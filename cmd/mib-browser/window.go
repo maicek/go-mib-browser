@@ -38,7 +38,7 @@ func CreateOsWindow() {
 	io.SetIniFilename("imgui.ini")
 
 	bnd.SetCloseCallback(func() {
-		os.Exit(1)
+		os.Exit(0)
 	})
 
 	smi.Init()

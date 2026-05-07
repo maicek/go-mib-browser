@@ -15,8 +15,6 @@ type SnmpClient struct {
 }
 
 func SetupSnmp(device *devices.Device) (*SnmpClient, error) {
-
-	fmt.Printf("Device: %+v\n", device)
 	snmp := &gosnmp.GoSNMP{
 		Target:                  device.IpAddr,
 		Port:                    uint16(device.SnmpPort),
@@ -64,7 +62,6 @@ func (s *SnmpClient) Walk(oid string) (chan *gosnmp.SnmpPDU, chan error, context
 	go func() {
 		defer cancel()
 		err := s.Snmp.Walk(oid, func(pdu gosnmp.SnmpPDU) error {
-			fmt.Printf("Result: %v\n", pdu)
 			select {
 			case results <- &pdu:
 			case <-ctx.Done():

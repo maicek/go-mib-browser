@@ -62,6 +62,4 @@ func PushCustomMib(mibPath string) {
 		fmt.Printf("Error writing data file: %s\n", err)
 		return
 	}
-
-	fmt.Printf("Wrote data file: %s with \"%s\"\n", datafilePath, raw)
 }

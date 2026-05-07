@@ -16,7 +16,6 @@ func (m *MainResultTable) Get(oid string) {
 	}
 	defer client.Snmp.Conn.Close()
 
-	fmt.Printf("Getting %s from %s\n", oid, devices.GetSelected().IpAddr)
 	result, err := client.Get(oid)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
@@ -34,12 +33,8 @@ func (m *MainResultTable) Walk(oid string) {
 	}
 	defer client.Snmp.Conn.Close()
 
-	fmt.Printf("Walking %s from %s\n", oid, devices.GetSelected().IpAddr)
 	results, errChan, _ := client.Walk(oid)
 
-	fmt.Printf("Walk this shit")
-
-	// handle channel messages, pop one message after another
 	for {
 		select {
 		case result, ok := <-results:
