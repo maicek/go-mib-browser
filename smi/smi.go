@@ -74,7 +74,7 @@ func Init() {
 	if err == nil {
 		for _, path := range mibPaths {
 			fmt.Printf("Load %s\n", path)
-			// Pass true for cached so it doesn't trigger side effects, 
+			// Pass true for cached so it doesn't trigger side effects,
 			// and we should add a non-rebuilding version of LoadFromFile if needed,
 			// but for now, let's just make sure we only rebuild at the end.
 			loadFromFileInternal(path)
@@ -316,4 +316,13 @@ func sortTree(node *MibNode) {
 	for _, child := range node.Children {
 		sortTree(child)
 	}
+}
+
+func GetOidInfo(oid string) (*gosmi.SmiNode, error) {
+	node, err := gosmi.GetNodeByOID(types.OidMustFromString(oid))
+	if err != nil {
+		return nil, err
+	}
+
+	return &node, nil
 }

@@ -25,11 +25,11 @@ func RenderMibNode(node *smi.MibNode) {
 
 	if imgui.BeginPopupContextItem() {
 		if imgui.MenuItemBool("Get") {
-			fmt.Printf("Get")
+			go mainResultTable.Get(node.OID)
 		}
 
 		if imgui.MenuItemBool("Walk") {
-			fmt.Printf("Walk")
+			go mainResultTable.Walk(node.OID)
 		}
 
 		if imgui.MenuItemBool("Copy OID") {

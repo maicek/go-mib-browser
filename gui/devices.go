@@ -17,7 +17,7 @@ func RenderDeviceToolbox() {
 				isActive := devices.SelectedDevice == i
 
 				if imgui.SelectableBool(fmt.Sprintf("%s##%d", device.Name, i)) {
-					devices.SelectedDevice = i
+					devices.SelectDevice(i)
 				}
 
 				if isActive {
@@ -116,7 +116,7 @@ func RenderDevicesConfig() {
 		imgui.SetCursorPos(imgui.CursorPos().Add(imgui.Vec2{X: 0, Y: availY}).Add(imgui.Vec2{X: 0, Y: itemHeight}).Add(imgui.Vec2{X: 0, Y: -74.0}))
 	}
 
-	imgui.TextDisabled("Changes needs to be saved to persistent storage. Click Save.")
+	imgui.TextDisabled("Settings needs to be saved to keep changes on next startup.")
 
 	btnColor := imgui.Vec4{X: 0.1, Y: 0.4, Z: 0.1, W: 1}
 	imgui.PushStyleColorVec4(imgui.ColButton, btnColor)

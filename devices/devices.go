@@ -1,6 +1,10 @@
 package devices
 
-import "github.com/gosnmp/gosnmp"
+import (
+	"fmt"
+
+	"github.com/gosnmp/gosnmp"
+)
 
 type Device struct {
 	Name        string             `json:"name"`
@@ -39,9 +43,25 @@ func AddNewDevice() {
 	})
 }
 
-func (d *Device) Remove() {
+func (d *Device) Remove() error {
 	Devices = append(Devices[:SelectedDevice], Devices[SelectedDevice+1:]...)
 	if SelectedDevice >= len(Devices) {
 		SelectedDevice = 0
 	}
+	return nil
+}
+
+func SelectDevice(id int) error {
+	if id < 0 || id >= len(Devices) {
+		return fmt.Errorf("Invalid device index")
+	}
+	SelectedDevice = id
+	return nil
+}
+
+func GetSelected() *Device {
+	if SelectedDevice >= len(Devices) {
+		return nil
+	}
+	return Devices[SelectedDevice]
 }
