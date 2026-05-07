@@ -17,12 +17,11 @@ type Device struct {
 	WriteCommunity string `json:"write_community"`
 
 	// SNMP v3
-	SecurityName     string                    `json:"security_name"`
-	AuthKey          string                    `json:"auth_key"`
-	AuthProtocol     gosnmp.SnmpV3AuthProtocol `json:"auth_protocol"`
-	PrivProtocol     gosnmp.SnmpV3PrivProtocol `json:"priv_protocol"`
-	PrivKey          string                    `json:"priv_key"`
-	SecurityEngineID string                    `json:"security_engine_id"`
+	UserName     string                    `json:"user_name"`
+	AuthPassword string                    `json:"auth_password"`
+	PrivPassword string                    `json:"priv_password"`
+	AuthProtocol gosnmp.SnmpV3AuthProtocol `json:"auth_protocol"`
+	PrivProtocol gosnmp.SnmpV3PrivProtocol `json:"priv_protocol"`
 }
 
 var Devices []*Device = make([]*Device, 0)

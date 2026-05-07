@@ -16,9 +16,9 @@ type SnmpClient struct {
 
 func SetupSnmp(device *devices.Device) (*SnmpClient, error) {
 	snmp := &gosnmp.GoSNMP{
-		Target:                  device.IpAddr,
-		Port:                    uint16(device.SnmpPort),
-		Community:               device.Community,
+		Target: device.IpAddr,
+		Port:   uint16(device.SnmpPort),
+
 		Transport:               "udp",
 		UseUnconnectedUDPSocket: true,
 		Retries:                 1,
@@ -26,6 +26,22 @@ func SetupSnmp(device *devices.Device) (*SnmpClient, error) {
 		Timeout:                 10 * time.Second,
 		MaxOids:                 10,
 		MaxRepetitions:          100,
+	}
+
+	switch device.SnmpVersion {
+	case gosnmp.Version2c, gosnmp.Version1:
+		snmp.Community = device.Community
+	case gosnmp.Version3:
+		snmp.SecurityModel = gosnmp.UserSecurityModel
+		snmp.MsgFlags = gosnmp.AuthPriv
+		secParams := &gosnmp.UsmSecurityParameters{
+			UserName:                 device.UserName,
+			AuthenticationProtocol:   device.AuthProtocol,
+			PrivacyProtocol:          device.PrivProtocol,
+			AuthenticationPassphrase: device.AuthPassword,
+			PrivacyPassphrase:        device.PrivPassword,
+		}
+		snmp.SecurityParameters = secParams
 	}
 
 	client := &SnmpClient{

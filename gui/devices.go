@@ -89,6 +89,48 @@ func RenderDevicesConfig() {
 				imgui.InputTextWithHint("Community (write)", "Provide community", &device.WriteCommunity, imgui.InputTextFlagsNone, nil)
 			case gosnmp.Version3:
 				//SNMP V3 security configuration
+				if imgui.BeginCombo("Authentication protocol", getAuthProtocolString(device.AuthProtocol)) {
+					if imgui.SelectableBool("No authentication") {
+						device.AuthProtocol = gosnmp.NoAuth
+					}
+
+					if imgui.SelectableBool("MD5") {
+						device.AuthProtocol = gosnmp.MD5
+					}
+
+					if imgui.SelectableBool("SHA") {
+						device.AuthProtocol = gosnmp.SHA
+					}
+
+					imgui.EndCombo()
+				}
+
+				if imgui.BeginCombo("Privacy protocol", getPrivProtocolString(device.PrivProtocol)) {
+					if imgui.SelectableBool("No privacy") {
+						device.PrivProtocol = gosnmp.NoPriv
+					}
+
+					if imgui.SelectableBool("DES") {
+						device.PrivProtocol = gosnmp.DES
+					}
+
+					if imgui.SelectableBool("AES") {
+						device.PrivProtocol = gosnmp.AES
+					}
+
+					imgui.EndCombo()
+				}
+
+				imgui.InputTextWithHint("User name", "Provide user name", &device.UserName, imgui.InputTextFlagsNone, nil)
+
+				if device.AuthProtocol != gosnmp.NoAuth {
+					imgui.InputTextWithHint("Authentication password", "Provide authentication password", &device.AuthPassword, imgui.InputTextFlagsNone, nil)
+				}
+
+				if device.PrivProtocol != gosnmp.NoPriv {
+					imgui.InputTextWithHint("Privacy password", "Provide privacy password", &device.PrivPassword, imgui.InputTextFlagsNone, nil)
+				}
+
 			}
 
 			btnColor := imgui.Vec4{X: 0.5, Y: 0.1, Z: 0.1, W: 1}
@@ -147,5 +189,27 @@ func getSnmpVersionString(v gosnmp.SnmpVersion) string {
 		return "SNMP V3"
 	default:
 		return "Unknown"
+	}
+}
+
+func getAuthProtocolString(p gosnmp.SnmpV3AuthProtocol) string {
+	switch p {
+	case gosnmp.MD5:
+		return "MD5"
+	case gosnmp.SHA:
+		return "SHA"
+	default:
+		return "NoAuth"
+	}
+}
+
+func getPrivProtocolString(p gosnmp.SnmpV3PrivProtocol) string {
+	switch p {
+	case gosnmp.DES:
+		return "DES"
+	case gosnmp.AES:
+		return "AES"
+	default:
+		return "NoPriv"
 	}
 }
