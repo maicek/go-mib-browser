@@ -10,7 +10,7 @@ import (
 	"golang.design/x/clipboard"
 )
 
-//go:embed Roboto.ttf
+//go:embed fonts/Roboto.ttf
 var fontFs embed.FS
 
 var clipboardSupported = false
@@ -18,9 +18,9 @@ var clipboardSupported = false
 func InitFont() {
 	io := imgui.CurrentIO()
 
-	loadedFontBytes, err := fontFs.ReadFile("Roboto.ttf")
+	loadedFontBytes, err := fontFs.ReadFile("fonts/Roboto.ttf")
 	if err != nil {
-		panic("Nie udało się odczytać fontu z embed: " + err.Error())
+		panic("Cannot read font file: " + err.Error())
 	}
 
 	fontConfig := imgui.NewFontConfig()
