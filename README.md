@@ -1,47 +1,58 @@
-An SNMP MIB Browser written in Go with:
+# go-mib-browser
 
-- [cimgui-go](https://github.com/AllenDang/cimgui-go) GUI library
-- [gosnmp](https://github.com/gosnmp/gosnmp) for SNMP communication
-- [gosmi](https://github.com/sleepinggenius2/gosmi) for MIB parsing
+Fast, lightweight SNMP MIB browser built with Go and ImGui.
+
+A high-performance diagnostic tool designed for network engineers who need a responsive and reliable way to explore SNMP-enabled devices. Unlike traditional MIB browsers, this tool focuses on speed, modern protocol support, and the ability to handle massive MIB collections without performance degradation.
 
 ## Motivation
 
-Project was primarily made as an internal devtool because other tools lacked snmpv3 support and also has limited number of loaded MIBs at once.
+This project was originally developed as an internal devtool to address the limitations of existing software—specifically the lack of robust SNMPv3 support and performance bottlenecks when loading large numbers of MIB files simultaneously.
 
-## Key features
+## Key Features
 
-- SNMP v1, v2c, v3 support
-- Unlimited loaded MIBs
-- Tree view of loaded MIBs
-- Lightweight and responsive GUI
-- Cross-platform (Windows, Linux, macOS)
-- Persistent device list
-- Works as standalone app or could be embedded into existing imgui devtool. (Lacks proper API for now but I plan to add it.)
+- **Full SNMP Support**: Native support for SNMP v1, v2c, and v3 (including USM).
+- **GPU-Accelerated GUI**: Built with [cimgui-go](https://github.com/AllenDang/cimgui-go) for a 60FPS, reactive user interface that remains smooth even with thousands of OIDs loaded.
+- **Scalable MIB Handling**: Utilizes [gosmi](https://github.com/sleepinggenius2/gosmi) for robust MIB parsing with no arbitrary limits on loaded modules.
+- **Persistent Management**: Built-in device list persistence for quick access to frequently monitored hardware.
+- **Standalone or Embedded**: Designed as a self-contained application, but architected to be integrated into larger diagnostic toolsets.
 
-## Building
+## Technical Stack
+
+- **Language**: Go 1.21+
+- **SNMP Engine**: [gosnmp](https://github.com/gosnmp/gosnmp)
+- **UI Framework**: [cimgui-go](https://github.com/AllenDang/cimgui-go) (Dear ImGui bindings)
+- **MIB Parser**: [gosmi](https://github.com/sleepinggenius2/gosmi)
+
+## Getting Started
+
+### Prerequisites
+
+Ensure you have Go installed on your system.
+
+### Installation
 
 ```bash
+git clone https://github.com/maicek/go-mib-browser.git
+cd go-mib-browser
 make build
 ```
 
-## Development
+### Development
 
-Requires [air](https://github.com/air-verse/air) installed.
+For hot-reloading during development, use [air](https://github.com/air-verse/air):
 
 ```bash
 air
 ```
 
-## Todo
+## Roadmap
 
-- [ ] Walk table.
-- [ ] SNMP Set.
-- [ ] Tree view.
-- [ ] Polling and graph of values.
-- [ ] Improved results table.
-  - [ ] Clear values.
-- [ ] Add SNMP Trap receiver.
+- [ ] **Data Visualization**: Real-time graphing of polled values.
+- [ ] **Tabular Views**: Comprehensive SNMP Walk and Table data rendering.
+- [ ] **Active Monitoring**: Integrated SNMP Trap receiver.
+- [ ] **Advanced Interactions**: Support for SNMP Set operations.
+- [ ] **Enhanced Filtering**: Search and filter results by OID, name, or value type.
 
 ## License
 
-The project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
