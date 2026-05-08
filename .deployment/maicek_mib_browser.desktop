@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=/usr/bin/maicek-go-mib-browser
+Name=Go MIB Browser
+Comment=MIB Browser for network management
+Type=Application
+Categories=Network;
