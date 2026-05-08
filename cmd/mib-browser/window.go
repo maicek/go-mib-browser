@@ -6,6 +6,7 @@ import (
 	"github.com/AllenDang/cimgui-go/backend"
 	"github.com/AllenDang/cimgui-go/backend/glfwbackend"
 	"github.com/AllenDang/cimgui-go/imgui"
+	"github.com/adrg/xdg"
 	"github.com/maicek/go-mib-browser/gui"
 	"github.com/maicek/go-mib-browser/smi"
 )
@@ -35,7 +36,8 @@ func CreateOsWindow() {
 	flags = flags &^ imgui.ConfigFlagsViewportsEnable
 	io.SetConfigFlags(flags)
 
-	io.SetIniFilename("imgui.ini")
+	xdgDir, _ := xdg.DataFile("maicek_mib_browser/imgui.ini")
+	io.SetIniFilename(xdgDir)
 
 	bnd.SetCloseCallback(func() {
 		os.Exit(0)
