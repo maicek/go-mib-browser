@@ -4,16 +4,23 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 )
+
+func init() {
+	runtime.LockOSThread()
+}
 
 func main() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	go CreateOsWindow()
+	go func() {
+		<-signalChan
+		fmt.Printf("close")
+		os.Exit(0)
+	}()
 
-	<-signalChan
-
-	fmt.Printf("close")
+	CreateOsWindow()
 }
