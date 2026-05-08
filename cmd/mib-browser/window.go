@@ -26,7 +26,6 @@ func CreateOsWindow() {
 	bnd.SetBgColor(imgui.NewVec4(0.09, 0.10, 0.13, 1.0))
 	bnd.CreateWindow("MIB Browser", 1280, 720)
 	bnd.SetTargetFPS(120)
-	bnd.SetSwapInterval(glfwbackend.GLFWSwapIntervalVsync)
 
 	io := imgui.CurrentIO()
 
@@ -49,7 +48,12 @@ func CreateOsWindow() {
 	gui.InitFont()
 	gui.ApplyTheme()
 
+	first := true
 	bnd.Run(func() {
+		if first {
+			bnd.SetSwapInterval(glfwbackend.GLFWSwapIntervalVsync)
+			first = false
+		}
 		gui.RenderStandaloneLayout()
 
 		if showMetricsWindow {
