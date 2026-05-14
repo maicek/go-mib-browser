@@ -23,7 +23,11 @@ This project was originally developed as an internal devtool to address the limi
 - **UI Framework**: [cimgui-go](https://github.com/AllenDang/cimgui-go) (Dear ImGui bindings)
 - **MIB Parser**: [gosmi](https://github.com/sleepinggenius2/gosmi)
 
-## Getting Started
+## Installation
+
+Download binary from releases :D.
+
+## Getting Started (Development)
 
 ### Prerequisites
 
